@@ -13,14 +13,13 @@ const Signup = ({ toggleSlide }) => {
         body: JSON.stringify(data),
       });
       
-      // If the backend route is missing, throw an error immediately
       if (!response.ok) throw new Error("Backend route missing or failed!");
       
       const result = await response.json();
       
       if (result.status === "success") {
         alert("Account created successfully! Welcome to the Hub.");
-        toggleSlide(); // Smoothly slide back to the login screen
+        toggleSlide(); 
       } else {
         alert("Signup failed: " + result.message);
       }
@@ -35,23 +34,27 @@ const Signup = ({ toggleSlide }) => {
       <h1>Join the Hub</h1>
       <p className="subtitle">Level up your experience today.</p>
       
-      <form onSubmit={handleSignup}>
+      {/* Added autoComplete="off" to the form */}
+      <form onSubmit={handleSignup} autoComplete="off">
         <input 
           type="text" 
           placeholder="Username" 
           required 
+          autoComplete="off"
           onChange={(e) => setData({...data, username: e.target.value})} 
         />
         <input 
           type="email" 
           placeholder="Email" 
           required 
+          autoComplete="off"
           onChange={(e) => setData({...data, email: e.target.value})} 
         />
         <input 
           type="password" 
           placeholder="Password" 
           required 
+          autoComplete="new-password"
           onChange={(e) => setData({...data, password: e.target.value})} 
         />
         

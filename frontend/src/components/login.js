@@ -16,15 +16,13 @@ const Login = ({ toggleSlide }) => {
     const result = await response.json();
     
     if (result.status === "success") {
-      // TELEPORT BASED ON ROLE, AND PASS THE USERNAME ALONG
       if (result.role === "admin") {
         navigate('/admin');
       } else {
-        // Send the username state through the router
         navigate('/landing', { state: { username: data.username } }); 
       }
     } else {
-      alert(result.message); // Only alert if there is an error
+      alert(result.message); 
     }
   };
 
@@ -33,17 +31,20 @@ const Login = ({ toggleSlide }) => {
       <h1>Hi Gamer</h1>
       <p className="subtitle">Welcome to the Gaming Hub</p>
       
-      <form onSubmit={handleLogin}>
+      {/* Added autoComplete="off" to the form */}
+      <form onSubmit={handleLogin} autoComplete="off">
         <input 
           type="text" 
           placeholder="Username" 
           required 
+          autoComplete="off" 
           onChange={(e) => setData({...data, username: e.target.value})} 
         />
         <input 
           type="password" 
           placeholder="Password" 
           required 
+          autoComplete="new-password" 
           onChange={(e) => setData({...data, password: e.target.value})} 
         />
         
