@@ -1,0 +1,48 @@
+/* Global Reset */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #050505; /* Deep black for the Grid */
+  color: white;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+/* Master Container that handles scrolling for all pages */
+.app-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #050505;
+  overflow-y: auto; /* THIS FIXES THE SCROLLING */
+  animation: fadeInPage 1s ease-out; /* Smooth fade-in on load */
+}
+
+/* --- THE AUTH SLIDING ANIMATION STYLES (Retained for Login/Signup) --- */
+.sliding-image {
+  position: absolute;
+  top: 0; left: 0;
+  width: 50%; height: 100%;
+  background-image: url('https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=1000');
+  background-size: cover; background-position: center;
+  transition: transform 0.7s cubic-bezier(0.77, 0, 0.175, 1);
+  z-index: 2;
+}
+
+.sliding-form {
+  position: absolute;
+  top: 0; right: 0;
+  width: 50%; height: 100%;
+  background: #0a0a0a; color: white;
+  display: flex; justify-content: center; align-items: center;
+  transition: transform 0.7s cubic-bezier(0.77, 0, 0.175, 1);
+  z-index: 1;
+}
+
+.sliding-image.move-right { transform: translateX(100%); }
+.sliding-form.move-left { transform: translateX(-100%); }
+
+/* Fade-in animation definition */
+@keyframes fadeInPage {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
