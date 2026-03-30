@@ -1,34 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom'; // IMPORT useLocation
+import { useNavigate, useLocation } from 'react-router-dom';
 import DynamicCanvasCrop from './utils/DynamicCanvasCrop';
 import './Css/Landing.css';
 
 const Landing = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Hook to access the passed state
+  const location = useLocation();
   const [games, setGames] = useState([]);
+  
+  // DYNAMIC CONTENT STATES
+  const [news, setNews] = useState([]);
+  const [heroBanner, setHeroBanner] = useState('');
+  
   const [showProfile, setShowProfile] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // GRAB THE USERNAME, DEFAULT TO 'GAMER' IF NONE IS FOUND
   const username = location.state?.username || 'Gamer';
-  
-  // GET THE FIRST LETTER AND MAKE IT UPPERCASE
   const avatarLetter = username.charAt(0).toUpperCase();
 
   useEffect(() => {
-    const fetchGames = async () => {
+    const fetchAllData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/top-games');
-        const data = await response.json();
-        if (data.status === 'success') {
-          setGames(data.games);
-        }
+        const [gRes, nRes, aRes] = await Promise.all([
+          fetch('http://localhost:8000/api/top-games').then(r => r.json()),
+          fetch('http://localhost:8000/api/news').then(r => r.json()),
+          fetch('http://localhost:8000/api/assets').then(r => r.json())
+        ]);
+        
+        if (gRes.status === 'success') setGames(gRes.games || []);
+        if (nRes.status === 'success') setNews(nRes.news || []);
+        
+        // BUG FIXED HERE: Changed 'hero_banner' to 'landing_hero' to match the database
+        if (aRes.status === 'success') setHeroBanner(aRes.assets.landing_hero || '');
+        
       } catch (error) {
         console.error("Database connection failed", error);
       }
     };
-    fetchGames();
+    fetchAllData();
   }, []);
 
   const handleLogout = () => navigate('/');
@@ -54,12 +63,10 @@ const Landing = () => {
         </div>
         <div className="profile-wrapper" onClick={() => setShowProfile(!showProfile)}>
           
-          {/* DISPLAY THE DYNAMIC AVATAR LETTER */}
           <div className="avatar">{avatarLetter}</div>
           
           {showProfile && (
             <div className="profile-dropdown">
-              {/* DISPLAY THE FULL USERNAME IN THE DROPDOWN */}
               <div className="dropdown-item" style={{color: '#fff', borderBottom: '1px solid #333'}}>
                 Hi, <strong>{username}</strong>
               </div>
@@ -92,49 +99,44 @@ const Landing = () => {
           </div>
         </div>
         <div className="hero-right">
-          <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1000" alt="Gaming visual" className="hero-image" />
+          {/* DYNAMIC HERO BANNER */}
+          <img 
+            src={heroBanner || "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1000"} 
+            alt="Gaming visual" 
+            className="hero-image" 
+          />
         </div>
       </section>
 
-      {/* HARDCODED NEWS SECTION (For Now) */}
       <section className="news-bento">
         <div className="bento-header">
           <h2>Latest Transmissions</h2>
           <p>The biggest updates from across the Grid.</p>
         </div>
         <div className="bento-grid">
-          <div className="bento-card wide">
-            <img src="https://images.unsplash.com/photo-1605901309584-818e25960b8f?q=80&w=1000" alt="GTA 6" className="bento-bg" />
-            <div className="bento-content">
-              <span className="bento-tag">BREAKING</span>
-              <h3>Grand Theft Auto VI: Return to Vice City</h3>
-              <p>Rockstar confirms a 2025 release window with a record-breaking trailer drop.</p>
-            </div>
-          </div>
-          <div className="bento-card square">
-            <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800" alt="Steam Sale" className="bento-bg" />
-            <div className="bento-content">
-              <span className="bento-tag store">STORE</span>
-              <h3>Steam Summer Sale</h3>
-              <p>Up to 85% off major titles starting next week.</p>
-            </div>
-          </div>
-          <div className="bento-card square">
-            <img src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=800" alt="RDR2 Update" className="bento-bg" />
-            <div className="bento-content">
-              <span className="bento-tag rumor">RUMOR</span>
-              <h3>RDR2 Next-Gen Patch</h3>
-              <p>Leaks suggest a 60FPS update is finally in development.</p>
-            </div>
-          </div>
-          <div className="bento-card wide">
-            <img src="https://images.unsplash.com/photo-1608889175123-8ee362201f81?q=80&w=1000" alt="Spider-Man" className="bento-bg" />
-            <div className="bento-content">
-              <span className="bento-tag update">UPDATE</span>
-              <h3>Marvel's Spider-Man: Symbiote DLC</h3>
-              <p>Insomniac reveals free new suits and challenges coming this Friday.</p>
-            </div>
-          </div>
+          
+          {/* DYNAMIC BENTO GRID LOOP */}
+          {news.map((item, index) => {
+            const cardClass = (index === 0 || index === 3) ? 'wide' : 'square';
+            
+            return (
+              <div key={item.id} className={`bento-card ${cardClass}`}>
+                <img 
+                  src={item.image_url || "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=500"} 
+                  alt={item.title} 
+                  className="bento-bg" 
+                />
+                <div className="bento-content">
+                  <span className={`bento-tag ${item.tag ? item.tag.toLowerCase() : ''}`}>
+                    {item.tag || 'NEW'}
+                  </span>
+                  <h3>{item.title || 'Awaiting Signal...'}</h3>
+                  <p>{item.description || 'Check back later for updates.'}</p>
+                </div>
+              </div>
+            );
+          })}
+
         </div>
       </section>
 
@@ -165,6 +167,7 @@ const Landing = () => {
                 }}
                 onClick={() => setCurrentIndex(index)}
               >
+                {/* DYNAMIC CANVAS CROP FOR CAROUSEL GAMES ONLY */}
                 <DynamicCanvasCrop
                   src={game.image}
                   cropData={game.crop_data}
