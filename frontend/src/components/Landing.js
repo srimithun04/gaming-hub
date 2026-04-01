@@ -56,7 +56,8 @@ const Landing = () => {
         <div className="logo">GAMING<span>HUB</span></div>
         <nav className="dash-nav">
           <span className="active">Home</span>
-          <span>Community</span>
+          {/* NEW: Click handler added to route to Community with user context */}
+          <span onClick={() => navigate('/community', { state: { username } })} style={{ cursor: 'pointer' }}>Community</span>
         </nav>
         <div className="search-bar">
           <input type="text" placeholder="Search games..." />
@@ -70,7 +71,7 @@ const Landing = () => {
               <div className="dropdown-item" style={{color: '#fff', borderBottom: '1px solid #333'}}>
                 Hi, <strong>{username}</strong>
               </div>
-              <div className="dropdown-item">Profile</div>
+              <div className="dropdown-item" onClick={() => navigate(`/profile/${username}`, { state: { username } })}>Profile</div>
               <div className="dropdown-item logout" onClick={handleLogout}>Logout</div>
             </div>
           )}

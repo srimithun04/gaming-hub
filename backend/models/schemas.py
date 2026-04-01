@@ -15,3 +15,17 @@ class NewsInput(BaseModel):
 
 class AssetInput(BaseModel):
     image_url: str
+
+# NEW: Validation for Community Posts
+class PostInput(BaseModel):
+    username: str
+    game_title: Optional[str] = None
+    content: Optional[str] = None
+    media_url: str
+    media_type: str = "image"
+
+# Add this to the bottom of your schemas.py
+class MessageInput(BaseModel):
+    sender: str
+    receiver: str
+    content: str

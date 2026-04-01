@@ -5,12 +5,12 @@ import Login from './components/login';
 import Signup from './components/signup';
 import Landing from './components/Landing';
 import AdminDashboard from './components/AdminDashboard'; 
-
+import Community from './components/Community'; // NEW
+import Profile from './components/Profile';
 function AuthPage() {
   const [isSignup, setIsSignup] = useState(false);
   const [loginBanner, setLoginBanner] = useState('');
 
-  // Fetch the login banner from the database
   useEffect(() => {
     fetch('http://localhost:8000/api/assets')
       .then(res => res.json())
@@ -22,7 +22,6 @@ function AuthPage() {
       .catch(err => console.error("Banner fetch failed", err));
   }, []);
 
-  // Apply the custom banner if it exists
   const dynamicBackground = {
     backgroundImage: loginBanner ? `url(${loginBanner})` : 'linear-gradient(45deg, #111, #222)',
     backgroundSize: 'cover',
@@ -31,16 +30,9 @@ function AuthPage() {
 
   return (
     <div className="auth-wrapper">
-      <div 
-        className={`sliding-image ${isSignup ? 'move-right' : ''}`}
-        style={dynamicBackground}
-      ></div>
+      <div className={`sliding-image ${isSignup ? 'move-right' : ''}`} style={dynamicBackground}></div>
       <div className={`sliding-form ${isSignup ? 'move-left' : ''}`}>
-        {isSignup ? (
-          <Signup toggleSlide={() => setIsSignup(false)} />
-        ) : (
-          <Login toggleSlide={() => setIsSignup(true)} />
-        )}
+        {isSignup ? <Signup toggleSlide={() => setIsSignup(false)} /> : <Login toggleSlide={() => setIsSignup(true)} />}
       </div>
     </div>
   );
@@ -53,6 +45,8 @@ function App() {
         <Route path="/" element={<AuthPage />} />
         <Route path="/landing" element={<Landing />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/community" element={<Community />} /> {/* NEW ROUTE */}
+        <Route path="/profile/:targetUsername" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );
